@@ -1,12 +1,13 @@
 
-
-// tt_nampuk_top
-module top(
-	input  wire       clk,
-	input  wire       rst_n,
-	input  wire [7:0] ui_in,
-	output wire [7:0] uo_out,
-	inout  wire [7:0] uio
+module processor (
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs
+    input  wire [7:0] uio_in,   // IOs: Input path
+    output wire [7:0] uio_out,  // IOs: Output path
+    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+    input  wire       ena,      // always 1 when the design is powered, so you can ignore it
+    input  wire       clk,      // clock
+    input  wire       rst_n     // reset_n - low to reset
 );
 
 wire spi_miso;
@@ -33,6 +34,7 @@ localparam
 reg [3:0] flags;
 reg [15: 0] current_instruction;
 
+wire _unused = &{flag_lt, flag_eq, flag_gt, flag_carry, LSB};
 
 wire [1:0] i_mode_outer;
 wire [1:0] i_mode_inner;
@@ -146,7 +148,7 @@ localparam
 
 reg [2:0] state;
 
-function alpha_lo_driver();
+function [7:0] alpha_lo_driver();
 	case (state)
 		STATE_IDLE:     alpha_lo_driver = 0;
 		STATE_FETCH_LO: alpha_lo_driver = 0;
@@ -159,7 +161,7 @@ function alpha_lo_driver();
 	endcase
 endfunction
 
-function alpha_hi_driver();
+function [7:0] alpha_hi_driver();
 	case (state)
 		STATE_IDLE:     alpha_hi_driver = 0;
 		STATE_FETCH_LO: alpha_hi_driver = 0;
@@ -169,6 +171,32 @@ function alpha_hi_driver();
 		STATE_EXEC,
 		STATE_WAIT_MEM,
 		STATE_WRAPUP:   alpha_hi_driver = 0;
+	endcase
+endfunction
+
+function [7:0] beta_lo_driver();
+	case (state)
+		STATE_IDLE:     beta_lo_driver = 0;
+		STATE_FETCH_LO: beta_lo_driver = 0;
+		STATE_WAIT_LO:  beta_lo_driver = 0;
+		STATE_FETCH_HI: beta_lo_driver = 0;
+		STATE_WAIT_HI:  beta_lo_driver = 0;
+		STATE_EXEC,
+		STATE_WAIT_MEM,
+		STATE_WRAPUP:   beta_lo_driver = 0;
+	endcase
+endfunction
+
+function [7:0] beta_hi_driver();
+	case (state)
+		STATE_IDLE:     beta_hi_driver = 0;
+		STATE_FETCH_LO: beta_hi_driver = 0;
+		STATE_WAIT_LO:  beta_hi_driver = 0;
+		STATE_FETCH_HI: beta_hi_driver = 0;
+		STATE_WAIT_HI:  beta_hi_driver = 0;
+		STATE_EXEC,
+		STATE_WAIT_MEM,
+		STATE_WRAPUP:   beta_hi_driver = 0;
 	endcase
 endfunction
 

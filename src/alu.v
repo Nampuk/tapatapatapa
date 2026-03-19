@@ -36,7 +36,7 @@ function [MSB:LSB] negative(input [MSB:LSB] val);
 	negative = (~val) + 1;
 endfunction
 
-// wire shut_up =  MINUS_ONE | MIN_VAL & MAX_VAL | LT & EQ & GT & CF;
+wire _unused =  &{MINUS_ONE, MIN_VAL, MAX_VAL, LT, EQ, GT, CF};
 
 wire lt_flag = (~a[MSB] & ~b[MSB] & a < b) | (a[MSB] && ~b[MSB]) | (a[MSB] & b[MSB] & a < b);
 wire gt_flag = ~lt_flag & a != b;
