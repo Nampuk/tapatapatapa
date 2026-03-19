@@ -18,14 +18,13 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
   - "tt_um_nampukk_top.v"
-  - "adder.v"
+  # - "adder.v"
   - "alu.v"
-  - "config.json"
-  - "idecoder.v"
-  - "memio.v"
-  - "processor.v"
-  - "project.v"
-  - "spi_ram_controller.v"
+  # - "idecoder.v"
+  # - "memio.v"
+  # - "processor.v"
+  # - "project.v"
+  # - "spi_ram_controller.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
