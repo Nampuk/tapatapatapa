@@ -1,16 +1,15 @@
 
 module alu #(parameter WIDTH = 16) (
 	input  wire  [2:0] ctl,
-	input  wire [MSB:LSB] a,
-	input  wire [MSB:LSB] b,
+	input  wire [WIDTH-1:0] a,
+	input  wire [WIDTH-1:0] b,
 	input wire increment,
-	output wire [MSB:LSB] res,
+	output wire [WIDTH-1:0] res,
 	output wire  [3:0] flags
 );
 
 localparam
 	MSB         = WIDTH - 1,
-	LSB         = 0,
 	POSBITS     = WIDTH - 1,
 	MINUS_ONE   = { WIDTH{1'b1} },
 	MIN_VAL     = {1'b1,  {POSBITS{1'b0}} },
@@ -32,7 +31,7 @@ localparam
 	GT = 2'd2,
 	CF = 2'd3;
 
-function [MSB:LSB] negative(input [MSB:LSB] val);
+function logic [MSB:0] negative(input [MSB:0] val);
 	negative = (~val) + 1;
 endfunction
 
@@ -45,7 +44,7 @@ wire carry_flag;
 
 assign flags[3:0] = {carry_flag, gt_flag, eq_flag, lt_flag };
 
-function [MSB:LSB] alu_calc();
+function logic [MSB:0] alu_calc();
 	case(ctl)
 		AND : alu_calc = a & b;
 		NOT : alu_calc =   ~a;
@@ -53,12 +52,12 @@ function [MSB:LSB] alu_calc();
 		SUB : alu_calc = a + negative(b);
 		OR  : alu_calc = a | b;
 		XOR : alu_calc = a ^ b;
-		SHL : alu_calc = { a[MSB-1:LSB], 1'b0 };
-		SHR : alu_calc = { 1'b0, a[MSB:LSB+1] };
+		SHL : alu_calc = { a[MSB-1:0], 1'b0 };
+		SHR : alu_calc = { 1'b0, a[MSB:1] };
 	endcase
 endfunction
 
-function [0:0] alu_carry();
+function logic alu_carry();
 	case(ctl)
 		AND : alu_carry = 1'b0;
 		NOT : alu_carry = 1'b0;
