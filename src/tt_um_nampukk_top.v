@@ -18,56 +18,84 @@ module tt_um_nampukk_top (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+assign uio_out = 0;
+assign uio_oe  = 0;
 
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+assign uio_out = 0;
+assign uio_oe  = 0;
 
-wire [3:0] addr = ui_in[7:4];
-wire [3:0] nibble  = ui_in[3:0];
+wire [7:0] _output;
+assign uo_out = _output;
 
-reg [2:0] ctl;
-reg carry;
-reg [7:0] a;
-wire [7:0] b = uio_in;
 
-wire [3:0] oflags;
+wire [1:0] addr = ui_in[5:4];
+wire [1:0] command  = ui_in[7:6];
+wire [3:0] alu_mode  = ui_in[3:0];
 
-alu #(.WIDTH(8)) inst (
+wire [7:0] word = uio_in;
+
+
+wire [2:0] ctl = alu_mode[2:0];
+wire carry = alu_mode[3];
+
+reg [7:0] a_lo;
+reg [7:0] a_hi;
+reg [7:0] b_lo;
+reg [7:0] b_hi;
+
+
+wire [7:0] res_lo;
+wire [7:0] res_hi;
+wire [3:0] res_flags;
+
+alu_ext inst (
 	.ctl(ctl),
-	.a(a),
-	.b(b),
+	.a_lo(a_lo),
+	.a_hi(a_hi),
+	.b_lo(b_lo),
+	.b_hi(b_hi),
 	.increment(carry),
-	.res(uo_out),
-	.flags(oflags)
+	.res_lo(res_lo),
+	.res_hi(res_hi),
+	.flags(res_flags)
 );
+
+function [7:0] mux_output();
+	case (command)
+		0: mux_output = res_lo;
+		1: mux_output = res_hi;
+		2: mux_output = {4'd0, res_flags};
+		3: mux_output = '0;
+	endcase
+endfunction
+
+assign _output = mux_output();
 
 always @(posedge clk) begin
 	if (!rst_n) begin
-		a <= 0;
-		ctl <= 0;
-		carry <= 0;
+		a_lo <= 0;
+		a_hi <= 0;
+		b_lo <= 0;
+		b_hi <= 0;
 	end else begin
 		case (addr)
 			0: begin
+				a_lo <= word;
 			end
 			1: begin
-				ctl <= nibble[2:0];
-				carry <= nibble[3];
+				a_hi <= word;
 			end
 			2: begin
-				a[3:0] <= nibble;
+				b_lo <= word;
 			end
 			3: begin
-				a[7:4] <= nibble;
+				b_hi <= word;
 			end
 		endcase
 	end
 end
 
-  // List all unused inputs to prevent warnings
-
-wire _unused = &{ena, clk, rst_n, 1'b0, oflags};
+// List all unused inputs to prevent warnings
+wire _unused = &{ena, 1'b0};
 
 endmodule
