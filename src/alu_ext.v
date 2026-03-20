@@ -11,9 +11,12 @@ module alu_ext (
 	output wire  [3:0] flags
 );
 
+localparam CF = 2'd3;
+
 wire [7:0] alu_res;
 wire [3:0] alu_flags;
-wire alu_carry = alu_flags[alu_inst.CF];
+wire alu_carry = alu_flags[CF];
+
 alu #(.WIDTH(8)) alu_inst (
 	.ctl(ctl),
 	.increment(increment),
