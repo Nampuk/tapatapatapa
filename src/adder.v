@@ -1,9 +1,9 @@
 
 module adder #(parameter WIDTH = 8) (
 	input  wire         carry_in,
-	input  wire [MSB:0] a,
-	input  wire [MSB:0] b,
-	output wire [MSB:0] res,
+	input  wire [WIDTH-1:0] a,
+	input  wire [WIDTH-1:0] b,
+	output wire [WIDTH-1:0] res,
 	output wire         carry_out
 );
 
