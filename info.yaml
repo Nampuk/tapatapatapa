@@ -21,6 +21,7 @@ project:
   # - "adder.v"
   - "alu.v"
   - "alu_ext.v"
+  - "adder.v"
   # - "idecoder.v"
   # - "memio.v"
   # - "processor.v"
